@@ -6,6 +6,7 @@ using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PhotoStockWebAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -29,21 +30,58 @@ namespace PhotoStockWebAPI.Controllers
         [HttpGet]
         public IActionResult GetAllEntities(int pageNumber = 1, int pageSize = 10)
         {
-            _logger.LogInformation("Get method GetAllEntities() called");
-            return Ok(_stockService.GetAllEntities(new ListParameters() { PageNumber = pageNumber, PageSize = pageSize }));
+            try
+            {
+                if (pageNumber < 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range");
+                }
+                if (pageSize < 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size is out of range");
+                }
+                _logger.LogInformation("Get method GetAllEntities() called");
+                return Ok(_stockService.GetAllEntities(new ListParameters() { PageNumber = pageNumber, PageSize = pageSize }));
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                _logger.LogError($"Error: {ex.Message}, on parameter: {ex.ParamName}");
+                return BadRequest(ex.Message);
+            }
         }
 
         [Route("api/[controller]/photos")]
         [HttpGet]
         public IActionResult GetAllPhotos(int pageNumber = 1, int pageSize = 10)
         {
-            _logger.LogInformation("Get method GetAllPhotos() called");
-            IEnumerable<PhotoDto> photoDtos = _stockService.GetPhotos(new ListParameters() { PageNumber = pageNumber, PageSize = pageSize });
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<PhotoDto, PhotoViewModel>()
-            .ForMember("AuthorName", opt => opt.MapFrom(src => src.Author.Name))
-            .ForMember("AuthorNickname", opt => opt.MapFrom(src => src.Author.Nickname))).CreateMapper();
-            var photos = mapper.Map<IEnumerable<PhotoDto>, List<PhotoViewModel>>(photoDtos);
-            return Ok(photos);
+            try
+            {
+                if(pageNumber<1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range");
+                }
+                if (pageSize < 1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size is out of range");
+                }
+                _logger.LogInformation("Get method GetAllPhotos() called");
+                IEnumerable<PhotoDto> photoDtos = _stockService.GetPhotos(new ListParameters() { PageNumber = pageNumber, PageSize = pageSize });
+                var mapper = new MapperConfiguration(cfg => cfg.CreateMap<PhotoDto, PhotoViewModel>()
+                .ForMember("AuthorName", opt => opt.MapFrom(src => src.Author.Name))
+                .ForMember("AuthorNickname", opt => opt.MapFrom(src => src.Author.Nickname))).CreateMapper();
+                var photos = mapper.Map<IEnumerable<PhotoDto>, List<PhotoViewModel>>(photoDtos);
+                return Ok(photos);
+            }
+            catch (ValidationDtoException ex)
+            {
+                _logger.LogError($"Error: {ex.Message}, on property: {ex.Property}");
+                return BadRequest(ex.Message);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                _logger.LogError($"Error: {ex.Message}, on parameter: {ex.ParamName}");
+                return BadRequest(ex.Message);
+            }
         }
 
         [Route("api/[controller]/texts")]
@@ -78,7 +116,7 @@ namespace PhotoStockWebAPI.Controllers
             catch (ValidationDtoException ex)
             {
                 _logger.LogError($"Error: {ex.Message}, on property: {ex.Property}");
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 

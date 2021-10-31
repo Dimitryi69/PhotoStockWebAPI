@@ -4,10 +4,53 @@ using System;
 
 namespace DataAccessLayer.Context
 {
+    //CREATE DATABASE [StockDatabase]
     public class PhotoStockContext : DbContext
     {
+        //CREATE TABLE[dbo].[Authors]
+        //(
+        //[Id][int] IDENTITY(1,1) NOT NULL,
+        //[Name] [nvarchar] (max) NOT NULL,
+        //[Nickname] [nvarchar] (450) NOT NULL,
+        //[Age] [int] NOT NULL,
+        //[CreationDate] [datetime2] (7) NOT NULL,
+        //CONSTRAINT[PK_Authors] PRIMARY KEY CLUSTERED
+        //)
         public DbSet<Author> Authors { get; set; }
+
+        //CREATE TABLE[dbo].[Photos]
+        //(
+        //[Id][int] IDENTITY(1,1) NOT NULL,
+        //[Name] [nvarchar] (max) NOT NULL,
+        //[ContentURI] [nvarchar] (max) NOT NULL,
+        //[CreationDate] [datetime2] (7) NOT NULL,
+        //[Height] [int] NOT NULL,
+        //[Width] [int] NOT NULL,
+        //[Price] [int] NOT NULL,
+        //[PurchaseCount] [int] NOT NULL,
+        //[Rating] [real] NOT NULL,
+        //[AuthorId] [int] NOT NULL,
+        //CONSTRAINT[PK_Photos] PRIMARY KEY CLUSTERED)
+        //ALTER TABLE [dbo].[Photos] WITH CHECK ADD CONSTRAINT [FK_Photos_Authors_AuthorId] FOREIGN KEY([AuthorId])
+        //REFERENCES [dbo].[Authors] ([Id])
+        //ON DELETE CASCADE
         public DbSet<Photo> Photos { get; set; }
+
+        //CREATE TABLE[dbo].[Texts](
+        //[Id][int] IDENTITY(1,1) NOT NULL,
+        //[Name] [nvarchar](max) NOT NULL,
+        //[Content] [nvarchar] (max) NOT NULL,
+        //[CreationDate] [datetime2] (7) NOT NULL,
+        //[Price] [int] NOT NULL,
+        //[Length] [int] NOT NULL,
+        //[PurchaseCount] [int] NOT NULL,
+        //[Rating] [real] NOT NULL,
+        //[AuthorId] [int] NOT NULL,
+        //CONSTRAINT[PK_Texts] PRIMARY KEY CLUSTERED)
+        //ALTER TABLE[dbo].[Texts] WITH CHECK ADD CONSTRAINT[FK_Texts_Authors_AuthorId] FOREIGN KEY([AuthorId])
+        //REFERENCES[dbo].[Authors]
+        //([Id])
+        //ON DELETE CASCADE
         public DbSet<Text> Texts { get; set; }
 
         public PhotoStockContext(DbContextOptions<PhotoStockContext> options)
